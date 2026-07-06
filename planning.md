@@ -78,7 +78,7 @@ flowchart TD
     I -->|appeal_id, status,\nconfirmation message| M([Creator receives confirmation])
 
     style C fill:#cc0000,color:#ffffff
-    style J fill:#ccffcc
-    style M fill:#ccffcc
+    style J fill:#1a7a4a,color:#ffffff
+    style M fill:#1a7a4a,color:#ffffff
     style I fill:#fff3cd
 ```
