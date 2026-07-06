@@ -77,7 +77,7 @@ flowchart TD
     L -->|writes appeal record\nstatus: under_review| I
     I -->|appeal_id, status,\nconfirmation message| M([Creator receives confirmation])
 
-    style C fill:#ffcccc
+    style C fill:#cc0000,color:#ffffff
     style J fill:#ccffcc
     style M fill:#ccffcc
     style I fill:#fff3cd
