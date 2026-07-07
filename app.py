@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from flask import Flask, jsonify, request
 
 from log import append_log_entry, get_log
+from scoring import attribution_for_confidence, compute_confidence, short_label_for_confidence
 from signals import get_llm_score
+from stylometric import get_stylometric_score
 
 app = Flask(__name__)
 
@@ -19,17 +21,19 @@ def submit():
         return jsonify({"error": "content and creator_id are required"}), 400
 
     llm_result = get_llm_score(content)
+    stylometric_result = get_stylometric_score(content)
 
-    # Stylometric signal + confidence scoring land in M4.
+    confidence = compute_confidence(llm_result["llm_score"], stylometric_result["stylometric_score"])
+
     entry = {
         "content_id": str(uuid.uuid4()),
         "creator_id": creator_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "attribution": "uncertain",
-        "confidence": llm_result["llm_score"],
+        "attribution": attribution_for_confidence(confidence),
+        "confidence": confidence,
         "signals": {
             "llm_score": llm_result["llm_score"],
-            "stylometric_score": None,
+            "stylometric_score": stylometric_result["stylometric_score"],
         },
         "status": "classified",
         "appeal": None,
@@ -40,7 +44,7 @@ def submit():
         "content_id": entry["content_id"],
         "attribution": entry["attribution"],
         "confidence": entry["confidence"],
-        "label": None,
+        "label": short_label_for_confidence(confidence),
         "signals": entry["signals"],
     }), 200
 

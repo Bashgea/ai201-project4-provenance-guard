@@ -4,11 +4,15 @@ import os
 LOG_PATH = os.path.join(os.path.dirname(__file__), "audit_log.json")
 
 
+
 def _read_log():
     if not os.path.exists(LOG_PATH):
         return []
     with open(LOG_PATH, "r") as f:
-        return json.load(f)
+        content = f.read().strip()
+        if not content:
+            return []
+        return json.loads(content)
 
 
 def _write_log(entries):
