@@ -4,10 +4,25 @@ STYLOMETRIC_WEIGHT = 0.4
 HUMAN_MAX = 0.35
 AI_MIN = 0.65
 
-SHORT_LABELS = {
-    "human": "Likely human-written",
-    "uncertain": "Uncertain",
-    "ai": "Likely AI-generated",
+# Exact strings from planning.md's Transparency Label Design section.
+LABEL_TEXT = {
+    "ai": (
+        "Our system detected patterns strongly associated with "
+        "AI-generated writing in this submission. This label does not "
+        "prevent the work from being shared — it provides context for "
+        "readers. If you wrote this yourself, you can file an appeal "
+        "and a human reviewer will take a look."
+    ),
+    "uncertain": (
+        "Our system found mixed signals in this submission and could "
+        "not make a confident determination. This content is marked "
+        "as uncertain. If you believe this label is incorrect, you "
+        "can file an appeal."
+    ),
+    "human": (
+        "Our system found no strong indicators of AI-generated writing "
+        "in this submission. This work appears to be human-authored."
+    ),
 }
 
 
@@ -27,8 +42,5 @@ def attribution_for_confidence(confidence: float) -> str:
     return "uncertain"
 
 
-def short_label_for_confidence(confidence: float) -> str:
-    """Short interim label. The full paragraph-form transparency text
-    from planning.md's Transparency Label Design lands in M5.
-    """
-    return SHORT_LABELS[attribution_for_confidence(confidence)]
+def label_for_confidence(confidence: float) -> str:
+    return LABEL_TEXT[attribution_for_confidence(confidence)]

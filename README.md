@@ -89,3 +89,40 @@ Rather than averaging to a false "high confidence AI" verdict,
 conflicting signals push the score toward the uncertain range,
 which produces a more cautious label and makes the appeal path
 clearly visible to the creator.
+
+---
+
+## Rate Limiting
+
+`POST /submit` is limited to **10 requests per minute and 100 per
+day**, keyed by client IP (Flask-Limiter's default).
+
+**Why these numbers:** a real writer submitting and revising their
+own drafts in one sitting might hit the endpoint a handful of times
+a minute at most — 10/minute comfortably covers that, including a
+few rapid retries, while still blocking a script that tries to flood
+the pipeline. 100/day covers a genuinely heavy day of revisions
+across multiple pieces without letting an automated client hammer
+the endpoint all day — each request costs a real Groq API call, so
+the daily cap also bounds cost exposure.
+
+**Evidence** — 12 rapid `POST /submit` calls from the same client,
+back to back:
+```
+200
+200
+200
+200
+200
+200
+200
+429
+429
+429
+429
+429
+```
+Only 7 show `200` here instead of 10 because 3 earlier requests in
+the same test session had already counted against this IP's
+1-minute window (3 + 7 = 10, then the limit engages) — confirming
+the counter is working per-IP as configured, not per-request-batch.
